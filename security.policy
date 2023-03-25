@@ -1,0 +1,6 @@
+grant {
+   permission java.net.SocketPermission "*:1024-65535", "connect,accept";
+   permission java.net.SocketPermission "*:80", "connect";
+   permission java.io.FilePermission "/Users/krishnakothandaraman/eclipse-workspace/Comp3258_Assignment1_Server/src/authfiles/UserInfo.txt", "read,write";
+   permission java.io.FilePermission "/Users/krishnakothandaraman/eclipse-workspace/Comp3258_Assignment1_Server/src/authfiles/OnlineUser.txt", "read,write";
+};
