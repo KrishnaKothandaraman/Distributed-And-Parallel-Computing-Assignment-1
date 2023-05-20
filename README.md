@@ -6,6 +6,7 @@
 
 1. Import all the files into your IDE under the src/ directory of your project
 2. The Project structure should be as follows 
+```tree
 /
 └── src/
     ├── authfiles/
@@ -19,6 +20,8 @@
     ├── ServerInterface.java
     ├── TextFileAuthenticator.java
     └── security.policy
+```
+
 
           
 3. Edit the security.policy file paths to the UserInfo, OnlineUser and temp.txt files in the same structure as given in the file. Just replace the path prefix before <src/file-name> with the path to that file on your machine
