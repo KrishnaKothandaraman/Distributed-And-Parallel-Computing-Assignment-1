@@ -7,7 +7,9 @@ import utils.AuthenticatorResult;
 public class Server extends UnicastRemoteObject implements ServerInterface{
 
 	private TextFileAuthenticator authenticator;
-	
+	static String currentDirectory = System.getProperty("user.dir");
+
+	private static String securityPolicyFilePath = currentDirectory + "/security.policy";
 	public Server() throws RemoteException {
 		super();
 		this.authenticator = new TextFileAuthenticator();
@@ -15,10 +17,12 @@ public class Server extends UnicastRemoteObject implements ServerInterface{
 
 	public static void main(String[] args) {
 		try {
-		System.setProperty("java.rmi.server.hostname", "10.70.193.78");
-		System.setProperty("java.security.policy","/Users/krishnakothandaraman/eclipse-workspace/Comp3258_Assignment1_Server/src/security.policy");
+		System.out.println(securityPolicyFilePath);
+		System.setProperty("java.rmi.server.hostname", args[0]);
+		System.setProperty("java.security.policy", securityPolicyFilePath);
 		System.setSecurityManager(new SecurityManager());
 		Server server = new Server();
+		System.out.println("Binding!");
 		Naming.bind("24Server", server);
 		System.out.println("Service registered!");
 	} catch(Exception e) {
@@ -35,5 +39,11 @@ public class Server extends UnicastRemoteObject implements ServerInterface{
 	public AuthenticatorResult register(String username, String password) throws RemoteException {
 		return authenticator.performRegistration(username, password);
 	}
+
+	@Override
+	public AuthenticatorResult logout(String username) {
+		return authenticator.performLogout(username);
+	}
+	
 
 }
