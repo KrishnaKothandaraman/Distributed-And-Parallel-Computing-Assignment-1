@@ -10,10 +10,13 @@ import utils.AuthenticatorResult;
 
 public class TextFileAuthenticator implements AuthInterface {
 
-    private String userInfoFilePath = "/Users/krishnakothandaraman/eclipse-workspace/Comp3258_Assignment1_Server/src/authfiles/UserInfo.txt";
-    private String onlineUserFilePath = "/Users/krishnakothandaraman/eclipse-workspace/Comp3258_Assignment1_Server/src/authfiles/OnlineUser.txt";
+	String currentDirectory = System.getProperty("user.dir");
+	String authFilesDirectory = currentDirectory + "/authfiles/";
 
-    
+	private String userInfoFilePath = authFilesDirectory + "UserInfo.txt";
+	private String onlineUserFilePath = authFilesDirectory + "OnlineUser.txt";
+	private String tempFilePath = authFilesDirectory + "temp.txt";
+
     public static void clearFile(String filePath) {
         try {
             FileWriter writer = new FileWriter(new File(filePath));
@@ -127,10 +130,9 @@ public class TextFileAuthenticator implements AuthInterface {
 	}
 
 	@Override
-	public void performLogout(String username) {
+	public AuthenticatorResult performLogout(String username) {
         try {
-            // Create a temporary file to hold the modified contents
-            String tempFilePath = "/Users/krishnakothandaraman/eclipse-workspace/Comp3258_Assignment1_Server/src/authfiles/temp.txt";
+            String tempFilePath = this.tempFilePath;
             FileWriter tempFileWriter = new FileWriter(tempFilePath);
             BufferedWriter tempWriter = new BufferedWriter(tempFileWriter);
 
@@ -151,25 +153,16 @@ public class TextFileAuthenticator implements AuthInterface {
             File tempFile = new File(tempFilePath);
             tempFile.renameTo(originalFile);
             System.out.println(username + "logged out successfully.");
+            return new AuthenticatorResult(true, username + " successfully logged out");
         } catch (IOException e) {
             System.out.println("Error in logging out " + username + " : " + e.getMessage());
+            return new AuthenticatorResult(false, username + " failed logout " + e.getMessage());
+
         }
     }
-	
+		
 	public TextFileAuthenticator() {
 		TextFileAuthenticator.clearFile(onlineUserFilePath);
 	}
-	
-//	public static void main(String[] args) {
-//		System.out.println("Hello from authenticator");
-//		TextFileAuthenticator auth = new TextFileAuthenticator();
-////		System.out.println(auth.performLogin("username1", "password1"));
-////		System.out.println(auth.performRegistration("username1", "password1"));
-////		System.out.println(auth.performRegistration("username1", "password1"));
-////		System.out.println(auth.performLogin("username1", "password1"));
-////		System.out.println(auth.performLogin("username1", "password1"));
-////		auth.performLogout("username1");
-////		System.out.println(auth.performLogin("username1", "password1"));
-//	}
 		
 }
