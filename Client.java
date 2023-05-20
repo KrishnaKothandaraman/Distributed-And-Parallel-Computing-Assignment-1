@@ -2,14 +2,22 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import utils.AuthenticatorResult;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class Client {
+	
+	private String username;
 	
 	private ServerInterface server;
     private JFrame mainFrame;
@@ -30,13 +38,15 @@ public class Client {
     
     private JPanel userProfilePanel, playGamePanel, leaderboardPanel, logoutPanel;
     private JTabbedPane tabbedPane;
+	static String currentDirectory = System.getProperty("user.dir");
 
+	private static String securityPolicyFilePath = currentDirectory + "/security.policy";
 	
 	public Client(String host){
 		try{
 			
 			System.out.println("Connecting to: " + host);
-			System.setProperty("java.security.policy","/Users/krishnakothandaraman/eclipse-workspace/Comp3258_Assignment1_Server/src/security.policy");
+			System.setProperty("java.security.policy",securityPolicyFilePath);
 			Registry registry = LocateRegistry.getRegistry(host);
 			server = (ServerInterface) registry.lookup("24Server");
 
@@ -59,6 +69,32 @@ public class Client {
 	        tabbedPane.addTab("Play Game", playGamePanel);
 	        tabbedPane.addTab("Leaderboard", leaderboardPanel);
 	        tabbedPane.addTab("Log out", logoutPanel);
+	        
+	        tabbedPane.addChangeListener(new ChangeListener() {
+				@Override
+				public void stateChanged(ChangeEvent e) {
+		        	int idx = tabbedPane.getSelectedIndex();
+		        	if (idx == 3) {
+		        		AuthenticatorResult logoutRes = null;
+		                int dialogResult = JOptionPane.showConfirmDialog(mainFrame, "Are you sure you want to log out?",
+		                                                                  "Confirm Logout", JOptionPane.YES_NO_OPTION);
+		                if (dialogResult == JOptionPane.YES_OPTION) {
+							try {
+								logoutRes = server.logout(username);
+							} catch (RemoteException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+		                    if (logoutRes.isSuccess()) {
+			                    mainFrame.dispose();
+		                    }
+		                    else {
+			                    JOptionPane.showMessageDialog(loginDialog, logoutRes.getMessage());
+		                    }
+		                }
+		        	}
+				}
+	        });
 
 	        mainFrame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
@@ -139,6 +175,7 @@ public class Client {
 								e1.printStackTrace();
 							}
 			                if (registerResult.isSuccess()) {
+			                	Client.this.username = username;
 			                    JOptionPane.showMessageDialog(loginDialog, registerResult.getMessage());
 			                    registerDialog.dispose();
 			                    mainFrame.setVisible(true);
@@ -166,33 +203,40 @@ public class Client {
 			        loginDialog.setVisible(true);
 				}
 	        });
-
-
 	        registerDialog.setVisible(false);
 	        mainFrame.setVisible(false);
 	        mainFrame.setLocationRelativeTo(null);
 	        loginDialog.setVisible(true);
 	        loginDialog.setLocationRelativeTo(null);
-	        registerDialog.setLocationRelativeTo(null);
-
-	        
-	        
+	        registerDialog.setLocationRelativeTo(null);   
 		} catch (Exception e){
 			System.err.println("Failed in RMI access!" + e);
 		}
 	}
     
-	private JLabel getUserProfilePanel() {
-		return new JLabel("User Profile Content");
+	private JPanel getUserProfilePanel() {
+		JPanel uInfoPanel = new JPanel();
+		JLabel nameLabel = new JLabel("Player 1");
+		uInfoPanel.add(nameLabel);
+		return uInfoPanel;
 	}
-	private JLabel getPlayGamePanel() {
-		return new JLabel("Play Game Content");
+	private JPanel getPlayGamePanel() {
+		JPanel uInfoPanel = new JPanel();
+		JLabel temp = new JLabel("Play Game Content");
+		uInfoPanel.add(temp);
+		return uInfoPanel;
 	}
-	private JLabel getLeaderBoardPanel() {
-		return new JLabel("Leaderboard Content");
+	private JPanel getLeaderBoardPanel() {
+		JPanel uInfoPanel = new JPanel();
+		JLabel temp = new JLabel("Leaderboard Content");
+		uInfoPanel.add(temp);
+		return uInfoPanel;
 	}
-	private JLabel getLeaderboardPanel() {
-		return new JLabel("Logout Content");
+	private JPanel getLeaderboardPanel() {
+		JPanel uInfoPanel = new JPanel();
+		JLabel temp = new JLabel("Logout Content");
+		uInfoPanel.add(temp);
+		return uInfoPanel;
 	}
 	
     ActionListener loginListener = new ActionListener() {
@@ -210,6 +254,7 @@ public class Client {
 				}
 
                 if (loginResult.isSuccess()) {
+                	Client.this.username = username;
                     JOptionPane.showMessageDialog(loginDialog, loginResult.getMessage());
                     loginDialog.dispose();
                     mainFrame.setVisible(true);
@@ -222,7 +267,7 @@ public class Client {
         }
     };
 	public static void main(String[] args) throws RemoteException {
-		Client client = new Client("10.70.193.78");
+		Client client = new Client(args[0]);
 
 	}
 	
