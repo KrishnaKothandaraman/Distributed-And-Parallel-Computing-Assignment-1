@@ -32,7 +32,7 @@ Note: Before running the rmiregistry, you may need to add the `path/to/src` in t
 5. Run the Server.java file with the ipaddr of the current machine as an argument. Note: On mac, the command to get the current ip address is ipconfig getifaddr en0, you may find the equivalent of that command on your operating system.
   `javac Server.java && java Server.java <ip-addr>`
   
-6. Run the client file with the following commands `javac Client.java && java Client rm Server.class && java Client 10.70.116.245`
+6. Run the client file with the following commands `javac Client.java && java Client 10.70.116.245`
 
 Now the GUI should be working!! Enjoy :)
 
